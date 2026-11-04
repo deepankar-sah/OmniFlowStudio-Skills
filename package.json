@@ -1,0 +1,29 @@
+{
+  "name": "omniflow-studio-skills",
+  "version": "1.0.0",
+  "description": "Autonomous AI Agent Skill for OmniFlow Studio — generative media and short film browser automation bridge.",
+  "main": "scripts/check-bridge.js",
+  "type": "module",
+  "scripts": {
+    "status": "node scripts/check-bridge.js",
+    "jobs": "node scripts/list-jobs.js",
+    "test": "node scripts/check-bridge.js"
+  },
+  "keywords": [
+    "ai-agent",
+    "agent-skill",
+    "claude-code",
+    "antigravity",
+    "mcp",
+    "google-flow",
+    "veo",
+    "video-generation",
+    "film-production"
+  ],
+  "author": "Deepankar Sah (Sanify Digital)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deepankar-sah/OmniFlowStudio-Skills.git"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "title": "Neon_Horizon_2088",
+  "aspect_ratio": "16:9",
+  "subfolder": "OmniFlow_Neon_Horizon",
+  "shots": [
+    {
+      "shotNumber": 1,
+      "cameraAngle": "drone-wide",
+      "durationSeconds": "6",
+      "characterTag": "NOVA",
+      "scenePrompt": "Aerial drone flyover descending through neon holographic skyscrapers of Neo-Shinjuku during a heavy midnight downpour, reflection of pink and cyan billboards across glossy wet pavement, cinematic anamorphic lens flares."
+    },
+    {
+      "shotNumber": 2,
+      "cameraAngle": "tracking",
+      "durationSeconds": "6",
+      "characterTag": "NOVA",
+      "scenePrompt": "Nova in a weathered matte-black cybernetic trenchcoat walks through a crowded ramen alleyway, steam rising into cold night air, handheld camera tracking from behind."
+    },
+    {
+      "shotNumber": 3,
+      "cameraAngle": "close-up",
+      "durationSeconds": "8",
+      "characterTag": "NOVA",
+      "scenePrompt": "Close up profile of Nova turning to face camera, eyes reflecting glowing amber terminal lights, rain droplets running down cybernetic cheek plating, volumetric rim light."
+    }
+  ]
+}
