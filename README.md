@@ -4,7 +4,15 @@
 
 [![Version](https://img.shields.io/badge/version-1.0.0-indigo.svg)](package.json)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Install%20Extension-blue.svg?logo=googlechrome)](https://chromewebstore.google.com/detail/fipkgokjnfakoapmfelkdfcikigicpgk)
 [![Platform](https://img.shields.io/badge/Platform-Chrome%20MV3%20%2B%20Node.js-emerald.svg)](https://sanifydigital.com)
+
+---
+
+## 🧩 Official Chrome Extension
+
+Before running agent automations, ensure the OmniFlow Studio Chrome Extension is installed:
+👉 **[Add OmniFlow Studio to Google Chrome](https://chromewebstore.google.com/detail/fipkgokjnfakoapmfelkdfcikigicpgk)** (Official Web Store)
 
 ---
 
