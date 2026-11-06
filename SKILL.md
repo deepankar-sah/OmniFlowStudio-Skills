@@ -32,7 +32,7 @@ OmniFlow operates on a 3-tier architecture with Cloudflare D1 hardware seat mana
 |---|---|---|---|---|---|
 | **Free** | ₹0 / $0 | **1x Standard** | 20 Shots / day | 1 Device | Basic human-paced UI automation |
 | **Pro** | ₹149/mo ($2/mo) | **5x Speed** | **Unlimited** | **2 Devices** (Office + Laptop) | Fast CDP text insert, FIFO batch queue, 1-click presets |
-| **Studio Max** | **₹499/mo ($10/mo)** | **10x Turbo** | **Unlimited (VIP)** | **4 Devices** (Multi-Workstation) | **Director Mode**, Frame-to-frame handoff, Raw CDN stream sniffer, 4K bridge |
+| **Studio Max** | **₹999/mo ($10/mo)** | **10x Turbo** | **Unlimited (VIP)** | **4 Devices** (Multi-Workstation) | **Director Mode**, Frame-to-frame handoff, Raw CDN stream sniffer, 4K bridge |
 
 ---
 

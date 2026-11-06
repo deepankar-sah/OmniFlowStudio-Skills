@@ -30,7 +30,7 @@ This skill allows your AI agents to act as **Autonomous Film Directors** and **C
 
 ## 💎 Tier & Entitlement Structure
 
-| Capability | Free Tier (₹0) | Pro Tier (₹149 / $2) | **Studio Max (₹499 / $10)** |
+| Capability | Free Tier (₹0) | Pro Tier (₹149 / $2) | **Studio Max (₹999 / $10)** |
 |---|---|---|---|
 | **Daily Generations** | 20 shots / day | **Unlimited** | **Unlimited + VIP Priority** |
 | **Generation Speed** | 1x Standard (Human Paced) | **5x Speed Boost** (Pipelined) | **10x Ultra Speed** (Zero Latency) |
