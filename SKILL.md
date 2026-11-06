@@ -4,12 +4,12 @@ description: Autonomous AI media generation, cinematic multi-shot film productio
 compatibility: Claude Code, Google Antigravity, Cursor, Codex, OpenGSD, MCP-compatible agents
 metadata:
   author: Deepankar Sah (Sanify Digital)
-  version: 1.0.0
+  version: 1.1.0
   port: 8792
-  protocol: HTTP / WebSocket / MCP Stdio
+  protocol: HTTP / WebSocket / MCP Stdio / Cloudflare Auth
 ---
 
-# OmniFlow Studio Agent Skill
+# OmniFlow Studio Agent Skill (v1.1.0)
 
 This skill grants AI coding and orchestration agents direct control over **OmniFlow Studio** — an autonomous bridge connecting local AI agents to high-fidelity generative media canvases in Google Chrome.
 
@@ -17,16 +17,38 @@ This skill grants AI coding and orchestration agents direct control over **OmniF
 
 Use this skill whenever:
 1. The user asks to generate cinematic AI videos, B-roll footage, concept art, or storyboards.
-2. Building or directing an autonomous multi-shot short film or ad creative.
-3. Generating character reference sheets (turnaround consistency) across multiple video scenes.
-4. Automating batch image/video generation queues without paying per-minute API fees.
-5. Inquiring about current OmniFlow bridge status, generation quotas, or active queue progress.
+2. Directing an autonomous multi-shot short film or ad creative using **Director Mode** (character & wardrobe consistency across consecutive scenes).
+3. Utilizing **Studio Max (10x Speed)** raw stream sniffing or **Pro (5x Speed)** fast batch dispatch.
+4. Managing multi-device seat activations (2 seats on Pro, 4 seats on Studio Max) with seamless cloud takeover.
+5. Inquiring about OmniFlow bridge status, generation quotas, or active queue progress.
+
+---
+
+## 💎 Tier & Performance Matrix
+
+OmniFlow operates on a 3-tier architecture with Cloudflare D1 hardware seat management:
+
+| Tier | Pricing | Speed Multiplier | Daily Quota | Allowed Active Seats | Key Capabilities |
+|---|---|---|---|---|---|
+| **Free** | ₹0 / $0 | **1x Standard** | 20 Shots / day | 1 Device | Basic human-paced UI automation |
+| **Pro** | ₹149/mo ($2/mo) | **5x Speed** | **Unlimited** | **2 Devices** (Office + Laptop) | Fast CDP text insert, FIFO batch queue, 1-click presets |
+| **Studio Max** | **₹499/mo ($10/mo)** | **10x Turbo** | **Unlimited (VIP)** | **4 Devices** (Multi-Workstation) | **Director Mode**, Frame-to-frame handoff, Raw CDN stream sniffer, 4K bridge |
+
+---
+
+## 🎬 Director Mode: Multi-Shot Cinematic Continuity
+
+Director Mode solves the #1 challenge in generative AI filmmaking: maintaining character face, clothing, and environment consistency across sequential camera shots.
+
+### The 4-Stage Director Pipeline:
+1. **Character DNA Anchor**: Renders a 4-angle turnaround sheet (Front, 45°, Profile, Close-Up) and locks the visual seed.
+2. **Scene 1 Establishing Shot**: Generates the opening scene clip using the anchor tokens.
+3. **Lossless Last-Frame Extraction**: The extension's HTML5 `<video>` canvas grabber extracts the exact 100% PNG frame at the end of Scene 1.
+4. **Frame-to-Frame Continuity Handoff**: Auto-injects Scene 1's last frame into Google Flow's image-to-video input and appends continuity camera deltas (`[Continuation: Match lighting, wardrobe, and action of attached frame]`).
 
 ---
 
 ## 🚀 Quick Execution Protocol for Agents
-
-Before dispatching media jobs, every agent must follow this 3-step verification loop:
 
 ### Step 1: Health & Bridge Check
 Verify the local OmniFlow bridge daemon is running on `http://127.0.0.1:8792`:
@@ -35,17 +57,17 @@ node scripts/check-bridge.js
 # Or curl directly:
 curl -s http://127.0.0.1:8792/status
 ```
-- **If Offline:** Instruct the user or run: `omniflow bridge start` (or start the bridge background task).
-- **If Online:** Check `extensionConnected` is `true` and `tabVisible` is `true` (means Chrome has Google Flow open).
+- **If Offline:** Run `omniflow bridge start` or start the bridge background daemon.
+- **If Online:** Check `extensionConnected === true` and `tabVisible === true`.
 
 ### Step 2: Submit a Generation Job
 Agents can submit via REST API or the provided helper scripts:
 
 ```bash
-# Helper script (easiest):
+# Helper script:
 node scripts/submit-shot.js --mode flow-text-to-video --prompt "Cinematic drone flyover neon cyberpunk Tokyo rain 8k" --aspectRatio 16:9 --duration 6s
 
-# Or direct HTTP POST:
+# Direct HTTP POST:
 curl -s -X POST http://127.0.0.1:8792/jobs \
   -H "Content-Type: application/json" \
   -d '{
@@ -71,6 +93,23 @@ When `status === "completed"`, retrieve the local file path from the `files` arr
 
 ---
 
+## 🛡️ Multi-Device Authentication & Seat Takeover
+
+Chrome extension users do NOT need to run the local bridge to activate Pro or Max licenses. Cloud authentication runs standalone:
+
+- **Email Login (`POST https://omniflow.sanifydigital.com/api/v1/auth/check-email`)**:
+  - Automatically checks active subscription in Cloudflare D1.
+  - Binds the current device to the user's quota.
+- **License Key Activation (`POST https://omniflow.sanifydigital.com/api/v1/license/bind`)**:
+  - Verifies key directly against Cloudflare encrypted secrets with zero bridge dependency.
+- **Seamless Device Takeover (Spotify/Cursor Style)**:
+  - If a Pro user exceeds 2 devices (or Max user exceeds 4 devices), the API returns `409 DEVICE_LIMIT_REACHED` with the list of active devices.
+  - Passing `replaceDeviceId` atomically disconnects the old PC and transfers access to the current machine.
+- **Unlink Device (`POST https://omniflow.sanifydigital.com/api/v1/auth/unlink-device`)**:
+  - Releases this PC's slot without cancelling or affecting the underlying paid subscription.
+
+---
+
 ## 🛠️ Supported Generation Modes
 
 | Mode ID | Description | Key Parameters |
@@ -79,17 +118,7 @@ When `status === "completed"`, retrieve the local file path from the `files` arr
 | `flow-text-to-image` | Generates photorealistic or stylized still images | `prompt`, `aspectRatio`, `imageModel` (`nano-banana-pro`) |
 | `flow-frame-to-video` | Extends a still image or keyframe into continuous video | `prompt`, `duration`, reference asset token |
 | `flow-create-character` | Generates 4-angle turnaround sheet for facial consistency | `characterName`, `visualDescription`, `voicePreset` |
-
----
-
-## 🎛️ MCP Tool Invocations (If MCP Server is Active)
-
-If OmniFlow's MCP server is connected in your agent environment, call these native tools directly:
-- `omniflow_status`: Check bridge and browser connection status.
-- `omniflow_generate_shot`: Queue a single shot with camera movement (`drone-wide`, `close-up`, `tracking`).
-- `omniflow_produce_movie`: Pass a complete screenplay array of ordered shots to produce an entire short film sequentially.
-- `omniflow_create_character`: Lock a character tag with front & profile turnaround consistency.
-- `omniflow_list_jobs`: List active, queued, and finished generation jobs with disk download paths.
+| `flow-director-mode` | Multi-shot sequential film production with frame handoff | `screenplay`, `characterAnchor`, `aspectRatio` |
 
 ---
 
