@@ -1,132 +1,207 @@
 ---
 name: omniflow-studio
-description: Autonomous AI media generation, cinematic multi-shot film production, and Google Flow automation bridge. Enables AI agents to queue text-to-video, text-to-image, and character consistency workflows with zero API costs.
+description: Autonomous AI media generation, cinematic multi-shot film production, and Google Flow automation bridge. Enables AI agents to queue text-to-video, text-to-image, character consistency, and autonomous self-healing workflows with zero API costs.
 compatibility: Claude Code, Google Antigravity, Cursor, Codex, OpenGSD, MCP-compatible agents
 metadata:
   author: Deepankar Sah (Sanify Digital)
-  version: 1.1.0
+  version: 1.2.0
   port: 8792
   protocol: HTTP / WebSocket / MCP Stdio / Cloudflare Auth
 ---
 
-# OmniFlow Studio Agent Skill (v1.1.0)
+# OmniFlow Studio Agent Skill (v1.2.0)
 
-This skill grants AI coding and orchestration agents direct control over **OmniFlow Studio** — an autonomous bridge connecting local AI agents to high-fidelity generative media canvases in Google Chrome.
-
-## When to Use This Skill
-
-Use this skill whenever:
-1. The user asks to generate cinematic AI videos, B-roll footage, concept art, or storyboards.
-2. Directing an autonomous multi-shot short film or ad creative using **Director Mode** (character & wardrobe consistency across consecutive scenes).
-3. Utilizing **Studio Max (10x Speed)** raw stream sniffing or **Pro (5x Speed)** fast batch dispatch.
-4. Managing multi-device seat activations (2 seats on Pro, 4 seats on Studio Max) with seamless cloud takeover.
-5. Inquiring about OmniFlow bridge status, generation quotas, or active queue progress.
+This skill empowers AI coding and orchestration agents to act as **Autonomous Film Directors** and **Generative Media Producers** through **OmniFlow Studio** — a high-performance local bridge and Chrome Extension that controls Google Flow and Veo 3.1 canvases directly inside Google Chrome with zero API fees.
 
 ---
 
-## 💎 Tier & Performance Matrix
+## 🎬 When to Use This Skill
 
-OmniFlow operates on a 3-tier architecture with Cloudflare D1 hardware seat management:
-
-| Tier | Pricing | Speed Multiplier | Daily Quota | Allowed Active Seats | Key Capabilities |
-|---|---|---|---|---|---|
-| **Free** | ₹0 / $0 | **1x Standard** | 20 Shots / day | 1 Device | Basic human-paced UI automation |
-| **Pro** | ₹149/mo ($2/mo) | **5x Speed** | **Unlimited** | **2 Devices** (Office + Laptop) | Fast CDP text insert, FIFO batch queue, 1-click presets |
-| **Studio Max** | **₹999/mo ($10/mo)** | **10x Turbo** | **Unlimited (VIP)** | **4 Devices** (Multi-Workstation) | **Director Mode**, Frame-to-frame handoff, Raw CDN stream sniffer, 4K bridge |
-
----
-
-## 🎬 Director Mode: Multi-Shot Cinematic Continuity
-
-Director Mode solves the #1 challenge in generative AI filmmaking: maintaining character face, clothing, and environment consistency across sequential camera shots.
-
-### The 4-Stage Director Pipeline:
-1. **Character DNA Anchor**: Renders a 4-angle turnaround sheet (Front, 45°, Profile, Close-Up) and locks the visual seed.
-2. **Scene 1 Establishing Shot**: Generates the opening scene clip using the anchor tokens.
-3. **Lossless Last-Frame Extraction**: The extension's HTML5 `<video>` canvas grabber extracts the exact 100% PNG frame at the end of Scene 1.
-4. **Frame-to-Frame Continuity Handoff**: Auto-injects Scene 1's last frame into Google Flow's image-to-video input and appends continuity camera deltas (`[Continuation: Match lighting, wardrobe, and action of attached frame]`).
+Activate this skill whenever the user or task involves:
+1. **Generating High-Fidelity Videos or Images**: Photorealistic video clips, cinematic b-roll, stylized stills, or concept art.
+2. **Autonomous Multi-Shot Film Direction (Director Mode)**: Multi-scene narrative continuity, character face/clothing consistency, and automated last-frame handoff between shots.
+3. **Studio Max (10x Turbo)** or **Pro (5x Speed)** media pipeline execution.
+4. **Autonomous Error Recovery & Self-Healing**: Resilient generation recovery against transient Google Flow failures or "unusual activity" notices without human intervention.
+5. **Checking Quotas & Bridge Status**: Verifying local bridge health, active generation queue progress, or seat licensing.
 
 ---
 
-## 🚀 Quick Execution Protocol for Agents
+## 🤖 The Agent-Centric Director Protocol (Zero UI Overhead)
 
-### Step 1: Health & Bridge Check
-Verify the local OmniFlow bridge daemon is running on `http://127.0.0.1:8792`:
-```bash
-node scripts/check-bridge.js
-# Or curl directly:
-curl -s http://127.0.0.1:8792/status
+OmniFlow operates under an **Agent-Centric Architecture**: there are no confusing browser UI buttons for the user to fiddle with. The AI agent manages the entire production cycle directly via native Model Context Protocol (MCP) tools or local HTTP endpoints.
+
+### 💬 Conversational User Alignment (Interview First)
+Before dispatching scenes to Google Flow, the AI agent must conduct a brief, friendly interview with the user to establish the creative vision:
+1. **Narrative & Story**: What is the core storyline, theme, or concept?
+2. **Visual Aesthetic**: What lighting, color palette, and lens style are desired? (e.g. *Anamorphic Cyberpunk, Golden Hour 35mm, Studio Ghibli Anime, Dark Nordic Noir*).
+3. **Aspect Ratio**: 
+   - `16:9` (Cinematic Film, YouTube, Desktop)
+   - `9:16` (Vertical Reels, TikTok, YouTube Shorts)
+   - `1:1` (Square Social Media)
+4. **Camera Language**: What camera movements best tell the story? (`drone-wide`, `slow tracking push-in`, `extreme close-up`, `orbit 360`, `low-angle tilt`).
+5. **Speed & Anti-Detection Profile**: `balanced` (recommended default), `stealth` (safe human cadence), or `turbo` (10x Studio Max).
+
+> **Crucial Rule:** The agent must always announce its chosen parameters and storyboard plan to the user before dispatching render jobs!
+
+---
+
+## 🎬 The 5-Step Director Mode Workflow
+
 ```
-- **If Offline:** Run `omniflow bridge start` or start the bridge background daemon.
-- **If Online:** Check `extensionConnected === true` and `tabVisible === true`.
+┌────────────────────────────────────────────────────────┐
+│ 1. Initialize Session ('flow_director_session')        │
+│    Set Title, Genre, Visual Aesthetic, Aspect Ratio    │
+└───────────────────────────┬────────────────────────────┘
+                            │
+┌───────────────────────────▼────────────────────────────┐
+│ 2. Character DNA Lock ('flow_director_character')      │
+│    Render 4-angle turnaround sheet to anchor identity  │
+└───────────────────────────┬────────────────────────────┘
+                            │
+┌───────────────────────────▼────────────────────────────┐
+│ 3. Register Storyboard Plan ('flow_director_plan')     │
+│    Validate ordered scenes and camera cinematics       │
+└───────────────────────────┬────────────────────────────┘
+                            │
+┌───────────────────────────▼────────────────────────────┐
+│ 4. Sequential Scene Generation                         │
+│    ('flow_director_generate_scene')                    │
+│    Auto-extracts Scene N-1 last frame for continuity   │
+└───────────────────────────┬────────────────────────────┘
+                            │
+┌───────────────────────────▼────────────────────────────┐
+│ 5. Lossless Master Cut Stitch ('flow_director_stitch') │
+│    Concatenates scene MP4s into final film in Downloads│
+└────────────────────────────────────────────────────────┘
+```
 
-### Step 2: Submit a Generation Job
-Agents can submit via REST API or the provided helper scripts:
+---
 
-```bash
-# Helper script:
-node scripts/submit-shot.js --mode flow-text-to-video --prompt "Cinematic drone flyover neon cyberpunk Tokyo rain 8k" --aspectRatio 16:9 --duration 6s
+## 🛠️ Complete MCP Tools Catalog
 
-# Direct HTTP POST:
-curl -s -X POST http://127.0.0.1:8792/jobs \
-  -H "Content-Type: application/json" \
-  -d '{
-    "mode": "flow-text-to-video",
-    "prompt": "Cinematic drone flyover neon cyberpunk Tokyo rain 8k",
-    "params": {
-      "aspectRatio": "16:9",
-      "duration": "6s",
-      "videoModel": "veo-3.1-fast",
-      "downloadSubfolder": "MyProject"
+Add OmniFlow's MCP server to your agent's config (`mcpServers`):
+```json
+{
+  "mcpServers": {
+    "omniflow": {
+      "command": "npx",
+      "args": ["-y", "omniflow-studio", "mcp"]
     }
-  }'
+  }
+}
 ```
 
-### Step 3: Monitor & Retrieve Downloaded Media
-Poll until the job status changes to `completed`:
-```bash
-node scripts/list-jobs.js
-# Or:
-curl -s http://127.0.0.1:8792/jobs
-```
-When `status === "completed"`, retrieve the local file path from the `files` array (e.g. `Downloads/MyProject/...mp4`).
-
----
-
-## 🛡️ Multi-Device Authentication & Seat Takeover
-
-Chrome extension users do NOT need to run the local bridge to activate Pro or Max licenses. Cloud authentication runs standalone:
-
-- **Email Login (`POST https://omniflow.sanifydigital.com/api/v1/auth/check-email`)**:
-  - Automatically checks active subscription in Cloudflare D1.
-  - Binds the current device to the user's quota.
-- **License Key Activation (`POST https://omniflow.sanifydigital.com/api/v1/license/bind`)**:
-  - Verifies key directly against Cloudflare encrypted secrets with zero bridge dependency.
-- **Seamless Device Takeover (Spotify/Cursor Style)**:
-  - If a Pro user exceeds 2 devices (or Max user exceeds 4 devices), the API returns `409 DEVICE_LIMIT_REACHED` with the list of active devices.
-  - Passing `replaceDeviceId` atomically disconnects the old PC and transfers access to the current machine.
-- **Unlink Device (`POST https://omniflow.sanifydigital.com/api/v1/auth/unlink-device`)**:
-  - Releases this PC's slot without cancelling or affecting the underlying paid subscription.
-
----
-
-## 🛠️ Supported Generation Modes
-
-| Mode ID | Description | Key Parameters |
+### 1. Director Mode Tools
+| Tool Name | Purpose | Key Parameters |
 |---|---|---|
-| `flow-text-to-video` | Generates motion video from a text description | `prompt`, `aspectRatio` (16:9, 9:16, 1:1), `duration` (4s, 6s, 8s) |
-| `flow-text-to-image` | Generates photorealistic or stylized still images | `prompt`, `aspectRatio`, `imageModel` (`nano-banana-pro`) |
-| `flow-frame-to-video` | Extends a still image or keyframe into continuous video | `prompt`, `duration`, reference asset token |
-| `flow-create-character` | Generates 4-angle turnaround sheet for facial consistency | `characterName`, `visualDescription`, `voicePreset` |
-| `flow-director-mode` | Multi-shot sequential film production with frame handoff | `screenplay`, `characterAnchor`, `aspectRatio` |
+| `flow_director_session` | Initializes production session settings | `title`, `genre`, `visual_aesthetic`, `aspect_ratio` (`16:9`, `9:16`, `1:1`), `speed_profile` (`balanced`, `stealth`, `turbo`), `default_duration` |
+| `flow_director_plan` | Registers an ordered storyboard of shots | `scenes`: Array of `{ scene_number, prompt, camera, duration, continuity_from_previous, character }` |
+| `flow_director_generate_scene` | Generates a specific planned scene on Google Flow | `scene_number`, `video_model` (`veo-3.1-fast`, `veo-3.1-quality`, `veo-2`) |
+| `flow_director_character` | Locks character facial & wardrobe consistency | `name`, `visual_description`, `voice_preset` |
+| `flow_director_stitch` | Losslessly joins scene MP4s into a master cut | `scene_files` (optional), `output_filename` |
+| `flow_director_status` | Returns production state, active jobs, and file paths | *(none)* |
+
+### 2. Studio Control & Error Recovery Tools
+| Tool Name | Purpose | Key Parameters |
+|---|---|---|
+| `flow_retry` | Autonomous in-page self-healing for failed tiles | *(none)* — Automatically finds unhandled failed tiles |
+| `flow_get_settings` | Inspects Google Flow settings across 7 categories | *(none)* |
+| `flow_configure_settings` | Configures mode, quality, duration, aspect ratio, model | `mode`, `aspect_ratio`, `quality`, `model`, `duration`, `outputs_per_prompt` |
+| `flow_inspect_state` | Returns live DOM state: title, characters, media | *(none)* |
+| `flow_upload_character` | Uploads character reference image to Flow library | `name`, `file_path` or `base64_data`, `mime_type` |
+| `flow_add_ingredients` | Attaches reference image into Flow prompt bar | `file_path` or `base64_data`, `filename` |
+| `flow_manage_project` | Creates a new Google Flow project canvas | `action`: `'create-new'` |
+| `flow_configure_delays` | Configures anti-detection typing speeds and delays | `profile`: `'stealth' \| 'balanced' \| 'turbo'` |
+
+### 3. Core Generation & Queue Tools
+| Tool Name | Purpose | Key Parameters |
+|---|---|---|
+| `omniflow_status` | Checks Bridge daemon and extension connectivity | *(none)* |
+| `omniflow_list_jobs` | Lists all historical and active media jobs | *(none)* |
+| `omniflow_generate_shot` | Queues single standalone video or image shot | `prompt`, `mode`, `aspect_ratio`, `duration`, `camera_movement` |
+| `omniflow_create_character` | Generates turnaround reference sheet | `name`, `visual_description`, `voice_preset` |
+| `omniflow_produce_movie` | High-level screenplay-to-film pipeline | `title`, `shots`, `aspect_ratio` |
 
 ---
 
-## 💡 Best Practices for Cinematic Prompts
+## 🛡️ Autonomous Error Recovery & Rate Limit Self-Healing
 
-For photorealistic video outputs with Veo 3.1:
-1. **Specify Camera Motion**: E.g. `[Camera: drone-wide]`, `[Camera: slow push-in]`, `[Camera: tracking shot]`.
-2. **Specify Lighting & Atmospherics**: E.g. `volumetric rim lighting`, `golden hour anamorphic haze`, `35mm film grain`.
-3. **Avoid Jargon**: Google Flow responds best to clear visual narrative descriptions rather than software tags.
+OmniFlow features an autonomous in-page error recovery system that monitors the Google Flow DOM for:
+- "Unusual activity" or rate limit warnings
+- "Generation failed" or "Something went wrong" tile cards
 
-See `references/api-reference.md` and `examples/cinematic-short-film.json` for ready-to-run multi-scene templates.
+### How the Recovery Engine Works:
+1. **Strict 1-Retry Cap per Tile**: To prevent infinite loops and runaway generation costs, each failed tile is retried at most **1 time**.
+2. **Dual-Layer Deduplication**:
+   - The failed button and card are tagged in the DOM with `data-omniflow-retried="true"`.
+   - The tile's spatial fingerprint is registered in an in-memory `Set` and `WeakSet`.
+   - Query selectors use `:not([data-omniflow-retried])` to guarantee handled cards are permanently ignored.
+3. **Visual Lock**: The retried button is dimmed (`opacity: 0.4; pointer-events: none`) so neither scripts nor accidental clicks can trigger duplicate runs.
+4. **Circuit Breaker Cooldown**: Enforces a 25-second minimum backoff between consecutive recovery cycles.
+5. **Manual Trigger**: Agents can also manually invoke recovery at any time using the `flow_retry` MCP tool or `POST http://127.0.0.1:8792/flow/retry`.
+
+---
+
+## ⚡ Quick Start for AI Agents
+
+### Step 1: Check System Health
+Run `npx omniflow-studio doctor` or query `omniflow_status`:
+```bash
+npx omniflow-studio doctor
+```
+Ensure:
+- Bridge is listening on `http://127.0.0.1:8792`.
+- Extension is connected.
+- Google Flow tab (`https://flow.google.com`) is open and logged in Chrome.
+
+### Step 2: Start Bridge Daemon (if offline)
+```bash
+npx omniflow-studio bridge daemon
+```
+
+### Step 3: Directing a Film via MCP
+```typescript
+// 1. Start Session
+await callTool('flow_director_session', {
+  title: 'Neon Odyssey',
+  genre: 'Cyberpunk Sci-Fi',
+  visual_aesthetic: 'Anamorphic lens flares, volumetric rain, neon blue and amber rim lighting, 8k hyperreal',
+  aspect_ratio: '16:9',
+  speed_profile: 'balanced'
+});
+
+// 2. Register Storyboard Plan
+await callTool('flow_director_plan', {
+  scenes: [
+    {
+      scene_number: 1,
+      prompt: 'A solitary rogue hacker in an iridescent trenchcoat stands on a rain-slicked skyscraper balcony looking over Neo-Shibuya',
+      camera: 'drone-wide',
+      duration: 6,
+      continuity_from_previous: false
+    },
+    {
+      scene_number: 2,
+      prompt: 'The hacker steps forward, pulling up a glowing cyan holographic data gauntlet while sirens reflect in the puddles',
+      camera: 'tracking push-in',
+      duration: 6,
+      continuity_from_previous: true
+    }
+  ]
+});
+
+// 3. Generate Scenes
+await callTool('flow_director_generate_scene', { scene_number: 1 });
+// Wait for Scene 1 completion, then generate Scene 2 with automatic frame chaining:
+await callTool('flow_director_generate_scene', { scene_number: 2 });
+
+// 4. Stitch Master Video
+await callTool('flow_director_stitch', { output_filename: 'Neon_Odyssey_Master.mp4' });
+```
+
+---
+
+## 📚 Reference Links
+- [`references/mcp-tools.md`](references/mcp-tools.md) — Exhaustive MCP tool arguments and schemas.
+- [`references/api-reference.md`](references/api-reference.md) — HTTP REST endpoints and JSON payloads.
+- [`references/cli-cheatsheet.md`](references/cli-cheatsheet.md) — CLI commands and flags.

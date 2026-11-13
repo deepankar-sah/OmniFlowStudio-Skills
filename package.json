@@ -1,6 +1,6 @@
 {
   "name": "omniflow-studio-skills",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Autonomous AI Agent Skill for OmniFlow Studio — generative media and short film browser automation bridge.",
   "main": "scripts/check-bridge.js",
   "type": "module",

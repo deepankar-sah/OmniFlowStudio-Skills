@@ -1,115 +1,19 @@
-# OmniFlow Bridge & Cloudflare Auth API Reference (v1.1.0)
+# OmniFlow Bridge & Cloudflare Auth API Reference (v1.2.0)
 
 OmniFlow provides two layers of APIs:
 1. **Cloudflare Production Auth API** (`https://omniflow.sanifydigital.com`): Handles global payments, multi-device seat management, and cloud verification without requiring a local bridge.
-2. **Local Loopback Bridge Daemon** (`http://127.0.0.1:8792`): Coordinates browser DevTools automation, FIFO media jobs, and filesystem downloads for local AI agents.
+2. **Local Loopback Bridge Daemon** (`http://127.0.0.1:8792`): Coordinates browser DevTools automation, FIFO media jobs, autonomous error recovery, and filesystem downloads for local AI agents.
 
 ---
 
-## 1. Cloudflare Production Auth Endpoints
-
-### `POST /api/v1/auth/check-email`
-Verifies user subscription and binds the requesting device.
-- **Request Body**:
-```json
-{
-  "email": "creator@example.com",
-  "deviceId": "dev_4b8f21e09c1248a1",
-  "deviceName": "Chrome on Windows",
-  "platform": "chrome-extension",
-  "replaceDeviceId": "optional_device_id_to_takeover"
-}
-```
-- **Response `200 OK` (Active Studio Max User)**:
-```json
-{
-  "success": true,
-  "isPro": true,
-  "tier": "max",
-  "unlimited": true,
-  "speedMultiplier": 10,
-  "maxSlots": 4,
-  "email": "creator@example.com",
-  "licenseKey": "OMNI-MAX-A996-3F45-7E7D",
-  "expiresAt": 1796563619304,
-  "message": "Active Studio Max Subscription found (10x Speed Multiplier)!"
-}
-```
-- **Error `409 Conflict` (Device Limit Reached)**:
-```json
-{
-  "error": "DEVICE_LIMIT_REACHED",
-  "tier": "pro",
-  "maxSlots": 2,
-  "activeDevices": [
-    {
-      "deviceId": "dev_office_pc",
-      "deviceName": "Office Desktop (Win11)",
-      "lastActive": 1793961126000
-    },
-    {
-      "deviceId": "dev_home_laptop",
-      "deviceName": "MacBook Pro M3",
-      "lastActive": 1793951126000
-    }
-  ],
-  "message": "Device limit reached (2 max). Select an existing device to replace."
-}
-```
-
-### `POST /api/v1/license/bind`
-Direct cloud license key verification with hardware seat takeover. Bypasses the local bridge.
-- **Request Body**:
-```json
-{
-  "licenseKey": "OMNI-PRO-D215-AE10-AF88",
-  "deviceId": "dev_4b8f21e09c1248a1",
-  "deviceName": "Chrome on Windows",
-  "replaceDeviceId": "optional_device_id_to_takeover"
-}
-```
-- **Response `200 OK`**:
-```json
-{
-  "valid": true,
-  "tier": "pro",
-  "speedMultiplier": 5,
-  "maxSlots": 2,
-  "unlimited": true,
-  "expiresAt": 1799145059106,
-  "seatBound": true
-}
-```
-
-### `POST /api/v1/auth/unlink-device`
-Releases a physical computer seat from Cloudflare D1 without cancelling the paid subscription.
-- **Request Body**:
-```json
-{
-  "email": "creator@example.com",
-  "licenseKey": "OMNI-PRO-D215-AE10-AF88",
-  "deviceId": "dev_4b8f21e09c1248a1"
-}
-```
-- **Response `200 OK`**:
-```json
-{
-  "success": true,
-  "unlinked": true,
-  "message": "Device seat released."
-}
-```
-
----
-
-## 2. Local Loopback Bridge API (`127.0.0.1:8792`)
+## 1. Local Loopback Bridge API (`127.0.0.1:8792`)
 
 ### `GET /health`
-Quick ping endpoint to verify the bridge server is running.
+Quick health check ping.
 ```json
 {
   "status": "ok",
-  "bridgeVersion": "1.1.0"
+  "bridgeVersion": "1.2.0"
 }
 ```
 
@@ -118,7 +22,7 @@ Full state of bridge, browser extension, and Chrome tabs.
 ```json
 {
   "bridge": "up",
-  "bridgeVersion": "1.1.0",
+  "bridgeVersion": "1.2.0",
   "extensionConnected": true,
   "extensionVersion": "1.0.0",
   "tabVisible": true,
@@ -126,49 +30,123 @@ Full state of bridge, browser extension, and Chrome tabs.
   "activeJobs": 0,
   "queuedJobs": 0,
   "quota": {
-    "isPro": true,
     "tier": "max",
-    "speedMultiplier": 10,
-    "dailyUsage": 4,
+    "dailyUsage": 3,
     "dailyLimit": 999999,
-    "remaining": 999995
+    "remaining": 999996
   }
 }
+```
+
+### `POST /reload-extension`
+Hot-reloads the unpacked Chrome extension and re-attaches DevTools hooks.
+```bash
+curl -X POST http://127.0.0.1:8792/reload-extension
 ```
 
 ---
 
-## 3. Jobs & Media Queue
+## 2. Autonomous Studio Control & Self-Healing Endpoints
+
+### `POST /flow/retry`
+Autonomously detects unhandled failed generation tiles or "unusual activity" notices on Google Flow and triggers an in-page retry.
+- **Deduplication Guarantee**: Strictly capped at 1 retry per tile instance. Never double-clicks or loops.
+- **Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "success": true,
+    "method": "in-page-retry"
+  }
+}
+```
+If no unhandled failed card exists:
+```json
+{
+  "success": false,
+  "error": "Error: No retryable failed tile found"
+}
+```
+
+### `GET /flow/settings`
+Scrapes all categorized generation settings from Google Flow across 7 distinct categories.
+- **Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "mode": "video",
+    "videoSubtype": "frames",
+    "aspectRatio": "16:9",
+    "videoQuality": "1080p",
+    "model": "veo-3.1-fast",
+    "duration": "6s",
+    "outputsPerPrompt": 1
+  }
+}
+```
+
+### `POST /flow/configure`
+Autonomously applies settings across the 7 categories directly in the Google Flow DOM.
+- **Request Body**:
+```json
+{
+  "mode": "video",
+  "aspectRatio": "16:9",
+  "model": "veo-3.1-fast",
+  "duration": "6",
+  "outputsPerPrompt": 1
+}
+```
+
+### `GET /flow/state`
+Returns real-time DOM telemetry: current canvas title, active character handles, attached ingredients, and recent media URLs.
+
+### `POST /flow/stitch`
+Studio Max Lossless Video Stitcher: Concatenates multiple scene MP4 files into a single master video in `Downloads/`.
+- **Request Body**:
+```json
+{
+  "sceneFiles": [
+    "C:/Users/ASUS/Downloads/OmniFlow/Scene_1.mp4",
+    "C:/Users/ASUS/Downloads/OmniFlow/Scene_2.mp4"
+  ],
+  "outputFilename": "Master_Cut.mp4"
+}
+```
+
+### `POST /flow/characters`
+Uploads a reference portrait image and registers it into Google Flow's Character Library.
+- **Request Body**:
+```json
+{
+  "name": "ELENA",
+  "base64": "data:image/png;base64,...",
+  "mimeType": "image/png"
+}
+```
+
+### `POST /flow/ingredients`
+Attaches a reference image directly into the Google Flow prompt composer.
+
+---
+
+## 3. Media Generation Queue Endpoints
 
 ### `POST /jobs`
-Submits a new generation job to the sequential FIFO queue.
-- **Headers**: `Content-Type: application/json`
+Submits a media generation job to the sequential FIFO queue.
 - **Request Body**:
 ```json
 {
   "mode": "flow-text-to-video",
-  "prompt": "Cinematic wide shot of an ancient sandstone temple illuminated by bioluminescent moss at dusk",
+  "prompt": "[Camera: drone-wide] Cyberpunk rain-slicked metropolis at dusk, 8k",
   "params": {
     "aspectRatio": "16:9",
     "duration": "6s",
     "videoModel": "veo-3.1-fast",
-    "characterName": "EXPLORER",
-    "downloadSubfolder": "Sandstone_Temple",
-    "fileNameTemplate": "{character}_{index} - {slug}"
-  }
-}
-```
-- **Director Mode Screenplay Request**:
-```json
-{
-  "mode": "flow-director-mode",
-  "prompt": "Multi-shot scene continuation",
-  "params": {
-    "characterAnchorSeed": "anchor_img_9214a",
-    "sceneIndex": 2,
-    "handoffLastFrame": true,
-    "aspectRatio": "16:9",
-    "continuityDelta": "Maintain character jacket and lighting, camera pans left"
+    "downloadSubfolder": "Cyberpunk_Teaser",
+    "autoRenameFiles": true
   }
 }
 ```
@@ -188,13 +166,13 @@ Lists all queued, running, and completed generation jobs with their local downlo
   {
     "id": "job_1730700000_a1b2c",
     "mode": "flow-text-to-video",
-    "prompt": "Cinematic wide shot...",
+    "prompt": "[Camera: drone-wide] Cyberpunk rain-slicked metropolis at dusk, 8k",
     "status": "completed",
     "percentage": 100,
     "files": [
       {
-        "filename": "EXPLORER_001 - cinematic-wide-shot.mp4",
-        "path": "C:\\Users\\User\\Downloads\\Sandstone_Temple\\EXPLORER_001.mp4",
+        "filename": "Cyberpunk_Teaser_001.mp4",
+        "path": "C:\\Users\\ASUS\\Downloads\\Cyberpunk_Teaser\\Cyberpunk_Teaser_001.mp4",
         "mimeType": "video/mp4",
         "sizeBytes": 14589200
       }
@@ -202,3 +180,16 @@ Lists all queued, running, and completed generation jobs with their local downlo
   }
 ]
 ```
+
+---
+
+## 4. Cloudflare Production Auth Endpoints
+
+### `POST https://omniflow.sanifydigital.com/api/v1/auth/check-email`
+Verifies user subscription in Cloudflare D1 and binds the requesting hardware seat.
+
+### `POST https://omniflow.sanifydigital.com/api/v1/license/bind`
+Cloud license key validation with hardware seat takeover (Spotify/Cursor style).
+
+### `POST https://omniflow.sanifydigital.com/api/v1/auth/unlink-device`
+Releases a physical computer seat without cancelling the user's paid subscription.
